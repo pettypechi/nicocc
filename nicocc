@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+
+PYTHON3=python3
+
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+ACTIVATE="$SCRIPT_DIR/.venv/bin/activate"
+REQUIREMENTS="$SCRIPT_DIR/src/requirements.txt"
+SCRIPT="$SCRIPT_DIR/src/nicocc.py"
+
+abort() {
+  echo "$1">&2
+  exit 1
+}
+
+if [ ! -f "$ACTIVATE" ]; then
+  command -v "$PYTHON3" || abort 'nicocc requires Python 3.4 or higher'
+  pushd "$SCRIPT_DIR"
+  "$PYTHON3" -m venv .venv 2>&1 >/dev/null || abort 'failed to create virtual environment'
+  popd
+fi
+
+. "$ACTIVATE" 2>&1 >/dev/null
+
+pip install -r "$REQUIREMENTS" 2>&1 >/dev/null
+
+python "$SCRIPT" "$@"
