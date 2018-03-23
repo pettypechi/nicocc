@@ -41,6 +41,9 @@ encoding = "utf-8"
 # 連続でサーバーに接続する間隔(ミリ秒)
 interval = 1000
 
+# サーバーエラー発生時の待機時間(ミリ秒)
+server_error_interval = 30000
+
 # 通信失敗時の再試行回数
 retry = 4
 

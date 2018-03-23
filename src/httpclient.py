@@ -24,7 +24,9 @@ from resource import TZ
 
 
 class RepresentError(Exception):
-    pass
+    def __init__(self, *args, is_server_error=False):
+        super().__init__(*args)
+        self.is_server_error = is_server_error
 
 
 def represent_default(req, res):
@@ -35,8 +37,6 @@ def represent_default(req, res):
 
 
 def handle_error_default(req, err):
-    if hasattr(err, 'status') and (err.status // 100) == 5:
-        sleep(30)
     raise err
 
 
@@ -59,12 +59,12 @@ class HttpClient:
         except KeyError:
             pass
 
-    def get_user_session(self)        :
+    def get_user_session(self):
         for cookie in self._cookiejar:
             if cookie.name == 'user_session' and cookie.path == '/' and cookie.domain == '.nicovideo.jp':
                 return cookie.value
 
-    def get_user_session_secure(self)        :
+    def get_user_session_secure(self):
         for cookie in self._cookiejar:
             if cookie.name == 'user_session_secure' and cookie.path == '/' and cookie.domain == '.nicovideo.jp':
                 return cookie.value
@@ -83,6 +83,7 @@ class HttpClient:
                 delta = self._lastaccess + self._r.config.http.interval - datetime.now(TZ).timestamp()
                 if delta > 0:
                     sleep(delta)
+            logger.debug('HTTPリクエスト %s - %s', request.get_method(), url)
             try:
                 response = opener.open(request)
             except Exception as err:
@@ -90,6 +91,8 @@ class HttpClient:
                     response = (handle_error_func if handle_error_func else handle_error_default)(request, err)
                 except Exception as err:
                     logger.warning(err)
+                    if hasattr(err, 'status') and (err.status // 100) == 5:
+                        sleep(self._r.config.http.server_error_interval)
                     continue
                 return response
             finally:
@@ -98,6 +101,8 @@ class HttpClient:
                 response = (represent_func if represent_func else represent_default)(request, response)
             except Exception as err:
                 logger.warning(err)
+                if isinstance(err, RepresentError) and err.is_server_error:
+                    sleep(self._r.config.http.server_error_interval)
                 continue
             return response
         return None
