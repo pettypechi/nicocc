@@ -24,7 +24,7 @@ _VIDEO_ID_REGEX = re.compile(r'^(sm)?[0-9]+$')
 def load_videos(r):
     logger.debug('動画リストファイルから動画情報を読み込みます。')
     videos = OrderedDict()
-    with open(r.path.videos_csv, 'r', encoding=r.config.counter.encoding) as f:
+    with open(r.path.videos_csv, 'r', encoding=r.config.counter.encoding, errors='xmlcharrefreplace') as f:
         reader = csv.reader(f)
         i = 0
         for row in reader:
@@ -279,7 +279,7 @@ def generate_result_csv(r):
         waybackkey = get_waybackkey(r, video_info.thread_id)
         when = int(r.config.counter.end.timestamp())
         last_no = None
-        with open(comment_temp_csv, mode='w', encoding=r.config.counter.encoding) as f:
+        with open(comment_temp_csv, mode='w', encoding=r.config.counter.encoding, errors='xmlcharrefreplace') as f:
             writer = csv.writer(f, lineterminator='\n')
             writer.writerow((
                 '動画ID',
@@ -317,7 +317,7 @@ def generate_result_csv(r):
                             comment.get('deleted', 0),
                             comment['vpos'],
                             comment.get('mail', ''),
-                            comment.get('content',''),
+                            comment.get('content', ''),
                             datetime.fromtimestamp(comment['date'], tz=TZ).strftime('%Y-%m-%d %H:%M:%S'),
                         ))
                     except Exception as err:
@@ -326,7 +326,7 @@ def generate_result_csv(r):
 
     result_csv = r.path.result_csv
     result_temp_csv = r.path.result_temp_csv
-    with open(result_temp_csv, mode='w', encoding=r.config.counter.encoding) as wf:
+    with open(result_temp_csv, mode='w', encoding=r.config.counter.encoding, errors='xmlcharrefreplace') as wf:
         writer = csv.writer(wf, lineterminator='\n')
         writer.writerow((
             '動画ID',
@@ -347,7 +347,7 @@ def generate_result_csv(r):
             attr = None
             comment_csv = r.path.get_comment_csv(video_id)
             if path.isfile(comment_csv):
-                with open(comment_csv, 'r', encoding=r.config.counter.encoding) as rf:
+                with open(comment_csv, 'r', encoding=r.config.counter.encoding, errors='xmlcharrefreplace') as rf:
                     reader = csv.reader(rf)
                     row = next(reader)
                     if row[0] != '動画ID':

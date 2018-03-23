@@ -44,7 +44,7 @@ def get_videos(r, mylist_id):
 def generate_videos_csv(r):
     videos_csv = r.path.videos_csv
     videos_temp_csv = r.path.videos_temp_csv
-    with open(videos_temp_csv, 'w', encoding=r.config.counter.encoding) as f:
+    with open(videos_temp_csv, 'w', encoding=r.config.counter.encoding, errors='xmlcharrefreplace') as f:
         writer = csv.writer(f, lineterminator='\n')
         for mylist_id in r.config.counter.mylist:
             videos = get_videos(r, mylist_id)
