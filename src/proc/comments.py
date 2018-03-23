@@ -322,6 +322,8 @@ def generate_result_csv(r):
                         ))
                     except Exception as err:
                         abort(err, logger)
+                if last_no == 1:
+                    break
         shutil.move(comment_temp_csv, comment_csv)
 
     result_csv = r.path.result_csv
