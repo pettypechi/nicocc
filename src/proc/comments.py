@@ -210,7 +210,7 @@ def get_waybackkey(r, thread_id):
     return waybackkey
 
 
-def get_comments(r, video_info, waybackkey, when):
+def get_comments(r, video_info, waybackkey, when, last_no):
     def represent(req, res):
         try:
             res = represent_default(req, res)
@@ -220,7 +220,8 @@ def get_comments(r, video_info, waybackkey, when):
             end = r.config.counter.end.timestamp()
             result = []
             for row in rows:
-                if 'chat' in row and 'user_id' in row['chat'] and start <= row['chat']['date'] <= end:
+                if 'chat' in row and 'user_id' in row['chat'] and start <= row['chat']['date'] <= end and (
+                        last_no is None or last_no > row['chat']['no']):
                     result.append(row['chat'])
                 elif 'thread' in row and row['thread']['resultcode'] != 0:
                     abort('コメントデータのパラメータが不正です。', logger)
@@ -233,32 +234,7 @@ def get_comments(r, video_info, waybackkey, when):
         {'ping': {'content': 'rs:1'}},
         {'ping': {'content': 'ps:11'}},
         {'thread': {
-            'language': 0,
-            'nicoru': 0,
-            'scores': 1,
-            'thread': video_info.thread_id,
-            'user_id': str(video_info.user_id),
-            'version': '20090904',
-            'waybackkey': waybackkey,
-            'when': when,
-            'with_global': 1,
-        }},
-        {'ping': {'content': 'pf:11'}},
-        {'ping': {'content': 'ps:12'}},
-        {'thread_leaves': {
-            'content': '0-%d:1000,1000' % (video_info.duration // 60 + 1),
-            'language': 0,
-            'nicoru': 0,
-            'scores': 1,
-            'thread': video_info.thread_id,
-            'user_id': str(video_info.user_id),
-            'waybackkey': waybackkey,
-            'when': when,
-        }},
-        {'ping': {'content': 'pf:12'}},
-        {'ping': {'content': 'ps:13'}},
-        {'thread': {
-            'fork': 1,
+            'fork': 0,
             'nicoru': 0,
             'res_from': -1000,
             'scores': 1,
@@ -266,10 +242,10 @@ def get_comments(r, video_info, waybackkey, when):
             'user_id': str(video_info.user_id),
             'version': '20061206',
             'waybackkey': waybackkey,
-            'when': when,
+            'when': when + 1,
             'with_global': 1,
         }},
-        {'ping': {'content': 'pf:13'}},
+        {'ping': {'content': 'pf:11'}},
         {'ping': {'content': 'rf:1'}},
     ]
     comments = r.client.request(
@@ -303,6 +279,7 @@ def generate_result_csv(r):
         video_info = get_video_info(r, video_id)
         waybackkey = get_waybackkey(r, video_info.thread_id)
         when = int(r.config.counter.end.timestamp())
+        last_no = None
         with open(comment_temp_csv, mode='w', encoding=r.config.counter.encoding) as f:
             writer = csv.writer(f, lineterminator='\n')
             writer.writerow((
@@ -319,13 +296,15 @@ def generate_result_csv(r):
                 'VPOS',
             ))
             while True:
-                comments = get_comments(r, video_info, waybackkey, when)
-                comments.reverse()
+                comments = get_comments(r, video_info, waybackkey, when, last_no)
                 if len(comments) == 0:
                     break
+                comments.reverse()
                 for comment in comments:
                     if comment['date'] < when:
                         when = comment['date']
+                    if last_no is None or comment['no'] < last_no:
+                        last_no = comment['no']
                     try:
                         writer.writerow((
                             video_id,
