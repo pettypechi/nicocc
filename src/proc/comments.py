@@ -191,9 +191,8 @@ def get_waybackkey(r, thread_id):
             data_dict = parse_qs(data)
             waybackkey = data_dict.get('waybackkey', [''])[0]
             if not waybackkey:
-                sleep(30)
                 logger.debug('waybackkey クエリ文字列 - %s' % data)
-                raise RepresentError('waybackkey の解析に失敗しました。')
+                raise RepresentError('waybackkey の解析に失敗しました。', is_server_error=True)
             return waybackkey
         except RepresentError as err:
             login(r)

@@ -157,6 +157,11 @@ _PARSER_DICT = {
             default_value=1,
             represent_func=lambda _: _ / 1000,
         ),
+        'server_error_interval': UIntParser(
+            'counter.server_error_interval',
+            default_value=30,
+            represent_func=lambda _: _ / 1000,
+        ),
         'retry': UIntParser(
             'counter.interval',
             default_value=2,
