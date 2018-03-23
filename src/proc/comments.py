@@ -219,7 +219,7 @@ def get_comments(r, video_info, waybackkey, when, last_no):
             end = r.config.counter.end.timestamp()
             result = []
             for row in rows:
-                if 'chat' in row and 'user_id' in row['chat'] and start <= row['chat']['date'] <= end and (
+                if 'chat' in row and start <= row['chat']['date'] <= end and (
                         last_no is None or last_no > row['chat']['no']):
                     result.append(row['chat'])
                 elif 'thread' in row and row['thread']['resultcode'] != 0:
@@ -236,7 +236,7 @@ def get_comments(r, video_info, waybackkey, when, last_no):
             'fork': 0,
             'nicoru': 0,
             'res_from': -1000,
-            'scores': 1,
+            'scores': 0,
             'thread': video_info.thread_id,
             'user_id': str(video_info.user_id),
             'version': '20061206',
@@ -287,12 +287,13 @@ def generate_result_csv(r):
                 '動画属性',
                 'コメント番号',
                 'ユーザーID',
-                'プレミアム会員',
-                '匿名',
-                'コメント',
-                'コマンド',
-                '書き込み日時',
+                'プレミアム会員フラグ',
+                '匿名フラグ',
+                '削除フラグ',
                 'VPOS',
+                'コマンド',
+                'コメント',
+                '書き込み日時',
             ))
             while True:
                 comments = get_comments(r, video_info, waybackkey, when, last_no)
@@ -310,13 +311,14 @@ def generate_result_csv(r):
                             video_title or video_info.title,
                             video_info.attr,
                             comment['no'],
-                            comment['user_id'],
+                            comment.get('user_id', ''),
                             comment.get('premium', 0),
                             comment.get('anonymity', 0),
-                            comment['content'],
-                            comment.get('mail', ''),
-                            datetime.fromtimestamp(comment['date'], tz=TZ).strftime('%Y-%m-%d %H:%M:%S'),
+                            comment.get('deleted', 0),
                             comment['vpos'],
+                            comment.get('mail', ''),
+                            comment.get('content',''),
+                            datetime.fromtimestamp(comment['date'], tz=TZ).strftime('%Y-%m-%d %H:%M:%S'),
                         ))
                     except Exception as err:
                         abort(err, logger)
@@ -329,7 +331,6 @@ def generate_result_csv(r):
         writer.writerow((
             '動画ID',
             '動画タイトル',
-            '動画属性',
             'プレミアム会員ユニークコメント',
             '匿名プレミアム会員ユニークコメント',
             '一般会員ユニークコメント',
@@ -354,7 +355,8 @@ def generate_result_csv(r):
                     for row in reader:
                         if title is None:
                             title = row[1] or video_title
-                            attr = row[2]
+                        if row[4] == '':
+                            continue
                         if row[5] == '1':
                             if row[6] == '1':
                                 result['premium_184'].add(row[4])
@@ -369,7 +371,6 @@ def generate_result_csv(r):
                 writer.writerow((
                     video_id,
                     title or video_title,
-                    attr,
                     len(result['premium']),
                     len(result['premium_184']),
                     len(result['general']),

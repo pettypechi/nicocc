@@ -79,7 +79,7 @@ class Resource:
             self.config.counter.start.strftime('%y%m%d-%H%M%S'),
             self.config.counter.end.strftime('%y%m%d-%H%M%S'),
         )
-        self.path.comment_dir = path.join(self.path.temp_dir, range)
+        self.path.comment_dir = path.join(self.path.temp_dir, self.str.version, range)
 
         if not path.isdir(self.path.comment_dir):
             os.makedirs(self.path.comment_dir)
