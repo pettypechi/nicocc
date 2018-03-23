@@ -179,7 +179,7 @@ def get_video_info(r, video_id):
     )
     if not video_info:
         abort('動画情報の取得に失敗しました。(video_id=%s)' % video_id, logger)
-    logger.debug('動画情報を取得しました。 - %s' % video_info)
+    logger.debug('%s 動画情報を取得しました。 - %s' % (video_id, video_info))
     return video_info
 
 
@@ -199,14 +199,14 @@ def get_waybackkey(r, thread_id):
             login(r)
             raise err
 
-    logger.debug('thread_id="%s" の waybackkey を取得します。' % thread_id)
+    logger.debug('thread_id=%s の waybackkey を取得します。' % thread_id)
     waybackkey = r.client.request(
         r.url.get_waybackkey_url(thread_id),
         represent_func=represent,
     )
     if not waybackkey:
         abort('waybackkey の取得に失敗しました。(thread_id=%s)' % thread_id, logger)
-    logger.debug('waybackkey を取得しました。 - %s', waybackkey)
+    logger.debug('thread_id=%s の waybackkey を取得しました。 - %s', thread_id, waybackkey)
     return waybackkey
 
 

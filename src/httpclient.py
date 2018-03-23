@@ -83,6 +83,7 @@ class HttpClient:
                 delta = self._lastaccess + self._r.config.http.interval - datetime.now(TZ).timestamp()
                 if delta > 0:
                     sleep(delta)
+            logger.debug('HTTPリクエスト %s - %s', request.get_method(), url)
             try:
                 response = opener.open(request)
             except Exception as err:
