@@ -25,20 +25,20 @@ class PathInfo:
         self.config_file = path.join(dir, 'nicocc.toml')
         self.temp_dir = path.join(dir, 'tmp')
         self.log_dir = path.join(dir, 'log')
-        self.videos_csv = path.join(dir, 'videos.txt')
-        self.videos_temp_csv = path.join(self.temp_dir, '_videos.txt')
-        self.result_csv = path.join(dir, 'result.txt')
-        self.result_temp_csv = path.join(self.temp_dir, '_result.txt')
+        self.videos_csv = path.join(dir, 'videos.csv')
+        self.videos_temp_csv = path.join(self.temp_dir, '_videos.csv')
+        self.result_csv = path.join(dir, 'result.csv')
+        self.result_temp_csv = path.join(self.temp_dir, '_result.csv')
         self.comment_dir = None
 
     def _get_comment_file(self, filename):
         return path.join(self.comment_dir, filename)
 
     def get_comment_temp_csv(self, video_id):
-        return self._get_comment_file('_%s.txt' % video_id)
+        return self._get_comment_file('_%s.csv' % video_id)
 
     def get_comment_csv(self, video_id):
-        return self._get_comment_file('%s.txt' % video_id)
+        return self._get_comment_file('%s.csv' % video_id)
 
 
 class UrlInfo:
@@ -75,11 +75,12 @@ class Resource:
         self.config = parse_config(self.path.config_file)
         self.client = HttpClient(self)
 
-        range = '%s_%s' % (
+        comment_dirname = '%s_%s_%s' % (
             self.config.counter.start.strftime('%y%m%d-%H%M%S'),
             self.config.counter.end.strftime('%y%m%d-%H%M%S'),
+            self.config.counter.encoding,
         )
-        self.path.comment_dir = path.join(self.path.temp_dir, self.str.version, range)
+        self.path.comment_dir = path.join(self.path.temp_dir, self.str.version, comment_dirname)
 
         if not path.isdir(self.path.comment_dir):
             os.makedirs(self.path.comment_dir)

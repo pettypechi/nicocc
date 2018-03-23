@@ -148,7 +148,7 @@ _PARSER_DICT = {
         ),
         'encoding': StringParser(
             'counter.encoding',
-            default_value='ms932',
+            default_value='cp932',
         )
     },
     'http': {
