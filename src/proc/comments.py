@@ -152,7 +152,7 @@ def get_video_info(r, video_id):
                 pass
             if not video_info.done:
                 logger.debug('%s の動画情報が見つかりませんでした。' % video_id)
-                return get_video_info_flapi(r, video_id, 'FLASH_ONLY')
+                return get_video_info_flapi(r, video_id, 'NORMAL')
             return video_info
         except RepresentError as err:
             login(r)
