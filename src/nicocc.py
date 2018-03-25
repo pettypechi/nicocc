@@ -1,6 +1,6 @@
 # coding: utf-8
 
-__version__ = '0.2.1'
+__version__ = '0.2.2'
 
 import sys
 
@@ -25,7 +25,7 @@ if __name__ == '__main__':
         with Resource(arg) as r:
             logger.info('%s の処理を開始します。', arg)
             puts('%s の処理を開始します。' % arg, logger)
-            if not path.isfile(r.path.videos_csv):
+            if r.config.counter.overwrite_videos or not path.isfile(r.path.videos_csv):
                 generate_videos_csv(r)
             generate_result_csv(r)
             puts('%s の処理を正常に終了しました。' % arg, logger)

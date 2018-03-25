@@ -90,6 +90,11 @@ class UIntParser(IntParser):
             raise ParserError('設定ファイル "{}" のパラメータ "{}" は符号なし整数を記述してください。', file, self.key)
 
 
+class BoolParser(TypeParser):
+    def __init__(self, key, **kwargs):
+        super().__init__(bool, key, **kwargs)
+
+
 class UIntListParser(TypeParser):
     def __init__(self, key, **kwargs):
         super().__init__(list, key, **kwargs)
@@ -145,6 +150,10 @@ _PARSER_DICT = {
         'mylist': UIntListParser(
             'counter.mylist',
             default_value=[],
+        ),
+        'overwrite_videos': BoolParser(
+            'counter.overwrite_videos',
+            default_value=True,
         ),
         'encoding': StringParser(
             'counter.encoding',
