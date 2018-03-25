@@ -365,7 +365,7 @@ def generate_result_csv(r):
                         abort('コメントファイル "%s" が不正です。' % comment_csv, logger)
                     for row in reader:
                         if title is None:
-                            title = row[1] or video_title
+                            title = row[1]
                         if row[4] == '':
                             continue
                         if row[5] == '1':
@@ -375,7 +375,7 @@ def generate_result_csv(r):
                             else:
                                 result['unique_premium'].add(row[4])
                                 result['count_premium'] += 1
-                        elif row:
+                        else:
                             if row[6] == '1':
                                 result['unique_general_184'].add(row[4])
                                 result['count_general_184'] += 1
@@ -385,7 +385,7 @@ def generate_result_csv(r):
             try:
                 writer.writerow((
                     video_id,
-                    title or video_title,
+                    video_title or title or '',
                     len(result['unique_premium']),
                     len(result['unique_premium_184']),
                     len(result['unique_general']),
