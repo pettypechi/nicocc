@@ -1,6 +1,6 @@
 # coding: utf-8
 
-__version__ = '0.2.2-SNAPSHOT'
+__version__ = '0.2.2'
 
 import sys
 
