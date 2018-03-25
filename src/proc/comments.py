@@ -335,20 +335,27 @@ def generate_result_csv(r):
         writer.writerow((
             '動画ID',
             '動画タイトル',
-            'プレミアム会員ユニークコメント',
-            '匿名プレミアム会員ユニークコメント',
-            '一般会員ユニークコメント',
-            '匿名一般会員ユニークコメント',
+            'プレミアム会員ユニークコメント数',
+            '匿名プレミアム会員ユニークコメント数',
+            '一般会員ユニークコメント数',
+            '匿名一般会員ユニークコメント数',
+            'プレミアム会員コメント数',
+            '匿名プレミアム会員コメント数',
+            '一般会員コメント数',
+            '匿名一般会員コメント数',
         ))
         for video_id, video_title in videos.items():
             result = {
-                'premium': set(),
-                'premium_184': set(),
-                'general': set(),
-                'general_184': set(),
+                'unique_premium': set(),
+                'unique_premium_184': set(),
+                'unique_general': set(),
+                'unique_general_184': set(),
+                'count_premium': 0,
+                'count_premium_184': 0,
+                'count_general': 0,
+                'count_general_184': 0,
             }
             title = None
-            attr = None
             comment_csv = r.path.get_comment_csv(video_id)
             if path.isfile(comment_csv):
                 with open(comment_csv, 'r', encoding=r.config.counter.encoding, errors='xmlcharrefreplace') as rf:
@@ -363,22 +370,30 @@ def generate_result_csv(r):
                             continue
                         if row[5] == '1':
                             if row[6] == '1':
-                                result['premium_184'].add(row[4])
+                                result['unique_premium_184'].add(row[4])
+                                result['count_premium_184'] += 1
                             else:
-                                result['premium'].add(row[4])
+                                result['unique_premium'].add(row[4])
+                                result['count_premium'] += 1
                         elif row:
                             if row[6] == '1':
-                                result['general_184'].add(row[4])
+                                result['unique_general_184'].add(row[4])
+                                result['count_general_184'] += 1
                             else:
-                                result['general'].add(row[4])
+                                result['unique_general'].add(row[4])
+                                result['count_general'] += 1
             try:
                 writer.writerow((
                     video_id,
                     title or video_title,
-                    len(result['premium']),
-                    len(result['premium_184']),
-                    len(result['general']),
-                    len(result['general_184']),
+                    len(result['unique_premium']),
+                    len(result['unique_premium_184']),
+                    len(result['unique_general']),
+                    len(result['unique_general_184']),
+                    result['count_premium'],
+                    result['count_premium_184'],
+                    result['count_general'],
+                    result['count_general_184'],
                 ))
             except Exception as err:
                 abort(err, logger)
