@@ -155,6 +155,10 @@ _PARSER_DICT = {
             'counter.overwrite_videos',
             default_value=True,
         ),
+        'skip_first_row': BoolParser(
+            'counter.skip_first_row',
+            default_value=True,
+        ),
         'encoding': StringParser(
             'counter.encoding',
             default_value='cp932',
@@ -172,7 +176,7 @@ _PARSER_DICT = {
             represent_func=lambda _: _ / 1000,
         ),
         'retry': UIntParser(
-            'counter.interval',
+            'counter.retry',
             default_value=2,
         ),
     },
