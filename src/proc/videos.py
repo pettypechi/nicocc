@@ -27,8 +27,14 @@ def get_videos(r, mylist_id):
             mylists = json.loads(m.group(1))
         except:
             raise RepresentError('マイリストデータの解析に失敗しました。%s' % data)
-        return [(mylist['item_data']['video_id'], mylist['item_data']['title'],) for mylist in mylists if
-                mylist['item_type'] == 0]
+        return [(
+            mylist['item_data']['video_id'],
+            mylist['item_data']['title'],
+            mylist['item_data']['view_counter'],
+            mylist['item_data']['num_res'],
+            mylist['item_data']['mylist_counter'],
+            mylist['item_data']['deleted'],
+        ) for mylist in mylists if mylist['item_type'] == 0]
 
     videos = r.client.request(
         r.url.get_mylist_url(mylist_id),
@@ -46,6 +52,14 @@ def generate_videos_csv(r):
     videos_temp_csv = r.path.videos_temp_csv
     with open(videos_temp_csv, 'w', encoding=r.config.counter.encoding, errors='xmlcharrefreplace') as f:
         writer = csv.writer(f, lineterminator='\n')
+        writer.writerow((
+            '動画ID',
+            '動画タイトル',
+            '再生数',
+            'コメント数',
+            'マイリスト数',
+            '削除フラグ',
+        ))
         for mylist_id in r.config.counter.mylist:
             videos = get_videos(r, mylist_id)
             try:
