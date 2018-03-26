@@ -207,7 +207,13 @@ def parse_config(config_file):
         section_dict = config_dict.get(name)
         if not isinstance(section_dict, dict):
             section_dict = {}
-        for k, v in parser_dict.items():
-            setattr(getattr(config, name), k, v.parse(section_dict.get(k), config_file))
+        for k, parser in parser_dict.items():
+            value = parser.parse(section_dict.get(k), config_file)
+            setattr(getattr(config, name), k, value)
+            if parser.key == 'user.password':
+                value = '*' * len(value)
+            elif isinstance(value, datetime):
+                value = value.strftime('%Y-%m-%d %H:%M:%S')
+            print('%s=%s' % (parser.key, repr(value)))
 
     return config
