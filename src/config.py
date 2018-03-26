@@ -176,7 +176,7 @@ _PARSER_DICT = {
             represent_func=lambda _: _ / 1000,
         ),
         'retry': UIntParser(
-            'counter.interval',
+            'counter.retry',
             default_value=2,
         ),
     },
