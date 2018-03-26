@@ -18,8 +18,11 @@ from proc import *
 if __name__ == '__main__':
     logger = getLogger(__name__)
 
-    if len(sys.argv) < 2 or  sys.argv[1] in ('--help','-h',):
+    if len(sys.argv) < 2 or sys.argv[1] in ('--help','-h',):
         print(HELP, file=sys.stderr)
+        sys.exit(1)
+    if sys.argv[1] in ('--version','-v',):
+        print('nicocc v%s' % __version__, file=sys.stderr)
         sys.exit(1)
     for arg in sys.argv[1:]:
         with Resource(arg) as r:
