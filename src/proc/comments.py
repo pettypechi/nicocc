@@ -272,7 +272,7 @@ def generate_result_csv(r):
         i += 1
         comment_csv = r.path.get_comment_csv(video_id)
         comment_temp_csv = r.path.get_comment_temp_csv(video_id)
-        if path.isfile(comment_csv):
+        if not r.incomplete_cache and path.isfile(comment_csv):
             puts('%s のコメント取得をスキップ (%d / %d)' % (video_id, i, len(videos)), logger)
             continue
         else:
@@ -328,9 +328,10 @@ def generate_result_csv(r):
                         abort(err, logger)
                 if last_no == 1:
                     break
-        shutil.move(comment_temp_csv, comment_csv)
+        if not r.incomplete_cache:
+            shutil.move(comment_temp_csv, comment_csv)
 
-    result_csv = r.path.result_csv
+    result_csv = r.path.get_result_csv(r.incomplete_cache)
     result_temp_csv = r.path.result_temp_csv
     with open(result_temp_csv, mode='w', encoding=r.config.counter.encoding, errors='xmlcharrefreplace') as wf:
         writer = csv.writer(wf, lineterminator='\n')
@@ -358,7 +359,8 @@ def generate_result_csv(r):
                 'count_general_184': 0,
             }
             title = None
-            comment_csv = r.path.get_comment_csv(video_id)
+            comment_csv = r.path.get_comment_temp_csv(video_id) \
+                if r.incomplete_cache else r.path.get_comment_csv(video_id)
             if path.isfile(comment_csv):
                 with open(comment_csv, 'r', encoding=r.config.counter.encoding, errors='xmlcharrefreplace') as rf:
                     reader = csv.reader(rf)

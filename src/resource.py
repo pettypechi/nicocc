@@ -27,7 +27,6 @@ class PathInfo:
         self.log_dir = path.join(dir, 'log')
         self.videos_csv = path.join(dir, 'videos.csv')
         self.videos_temp_csv = path.join(self.temp_dir, '_videos.csv')
-        self.result_csv = path.join(dir, 'result.csv')
         self.result_temp_csv = path.join(self.temp_dir, '_result.csv')
         self.comment_dir = None
 
@@ -39,6 +38,9 @@ class PathInfo:
 
     def get_comment_csv(self, video_id):
         return self._get_comment_file('%s.csv' % video_id)
+
+    def get_result_csv(self, incomplete):
+        return path.join(self.work_dir, 'incomplete_result.csv' if incomplete else 'result.csv')
 
 
 class UrlInfo:
@@ -74,6 +76,7 @@ class Resource:
         self.str = StringInfo()
         self.config = parse_config(self.path.config_file)
         self.client = HttpClient(self)
+        self.incomplete_cache = datetime.now().timestamp() < self.config.counter.end.timestamp()
 
         comment_dirname = '%s_%s_%s' % (
             self.config.counter.start.strftime('%y%m%d-%H%M%S'),
