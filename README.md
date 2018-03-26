@@ -20,7 +20,7 @@
 評価値 = P × 1000 + Pa × 100 + G × 10 + Ga × 1
 
 ## 動作環境
-python3 へのパスが通っていること
+- python3.4 以上
 
 ※ubuntu などの一部の環境では、venvモジュールを別途インストールする必要があるようです。
 コマンド実行時に`failed to create virtual environment`と表示される場合は、

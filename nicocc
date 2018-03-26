@@ -13,10 +13,11 @@ abort() {
 }
 
 if [ ! -f "$ACTIVATE" ]; then
-  command -v "$PYTHON3" || abort 'nicocc requires Python 3.4 or higher'
-  pushd "$SCRIPT_DIR"
+  command -v "$PYTHON3" 2>&1 >/dev/null || abort 'nicocc requires Python 3.4 or higher'
+  "$PYTHON3" -c 'import sys; sys.exit(0) if sys.version_info[0] == 3 and sys.version_info[1] > 3 else sys.exit(1)' || abort 'nicocc requires Python 3.4 or higher'
+  pushd "$SCRIPT_DIR" 2>&1 >/dev/null
   "$PYTHON3" -m venv .venv 2>&1 >/dev/null || abort 'failed to create virtual environment'
-  popd
+  popd 2>&1 >/dev/null
 fi
 
 . "$ACTIVATE" 2>&1 >/dev/null
