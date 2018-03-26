@@ -30,6 +30,9 @@ mylist = [ 60232979 ]
 # 動画ID取得をスキップして、既存の videos.csv から動画リストを読み込む
 overwrite_videos = true
 
+# true の場合、videos.csv の一行目を無視して読み込む
+skip_first_row = true
+
 # 入出力ファイルの文字コード
 # 初期値 "cp932" は Excel との互換性のため
 # cp932 の場合、サポートされていない文字は &#nnn; 形式の XML 文字参照に置換される

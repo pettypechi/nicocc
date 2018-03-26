@@ -26,6 +26,8 @@ def load_videos(r):
     videos = OrderedDict()
     with open(r.path.videos_csv, 'r', encoding=r.config.counter.encoding, errors='xmlcharrefreplace') as f:
         reader = csv.reader(f)
+        if r.config.counter.skip_first_row:
+            next(reader)
         i = 0
         for row in reader:
             i += 1
