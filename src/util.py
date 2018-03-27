@@ -22,5 +22,8 @@ def abort(msg, logger):
 
 HELP = '''\
 Usage:
-    nicocc <対象となる nicocc.toml を含むフォルダのパス>...
+    nicocc <対象となる nicocc.toml を含むフォルダのパス> ...
+    nicocc --show-config <対象となる nicocc.toml を含むフォルダのパス> ...
+    nicocc --version
+    nicocc --help
 '''
