@@ -1,6 +1,6 @@
 # coding: utf-8
 
-__version__ = '0.2.4'
+__version__ = '0.2.5'
 
 import sys
 
@@ -18,13 +18,20 @@ from proc import *
 if __name__ == '__main__':
     logger = getLogger(__name__)
 
-    if len(sys.argv) < 2 or  sys.argv[1] in ('--help','-h',):
+    if len(sys.argv) < 2 or sys.argv[1] in ('--help','-h',):
         print(HELP, file=sys.stderr)
         sys.exit(1)
+    if sys.argv[1] in ('--version','-v',):
+        print('nicocc v%s' % __version__, file=sys.stderr)
+        sys.exit(1)
+    if sys.argv[1] in ('--show-config','-c',):
+        for arg in sys.argv[2:]:
+            print('%s の設定値' % arg)
+            print(Resource(arg).config)
     for arg in sys.argv[1:]:
         with Resource(arg) as r:
-            logger.info('%s の処理を開始します。', arg)
             puts('%s の処理を開始します。' % arg, logger)
+            print(r.config, end='')
             if r.config.counter.overwrite_videos or not path.isfile(r.path.videos_csv):
                 generate_videos_csv(r)
             generate_result_csv(r)

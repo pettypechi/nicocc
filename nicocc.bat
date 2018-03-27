@@ -15,7 +15,7 @@ if not exist "%ACTIVATE%" (
     echo nicocc requires Python 3.4 or higher
     goto ABORT
   )
-  %PYTHON3% -c "import sys; sys.exit(1) if sys.version_info[0] < 3 else sys.exit(0)" >nul
+  %PYTHON3% -c "import sys; sys.exit(0) if sys.version_info[0] == 3 and sys.version_info[1] > 3 else sys.exit(1)" >nul
   if "!ERRORLEVEL!" == "0" (
     call :VENV
   ) else (

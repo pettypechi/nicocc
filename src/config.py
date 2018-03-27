@@ -23,7 +23,14 @@ class ParserError(Exception):
 
 
 class Config:
-    pass
+    def __init__(self):
+        self._repr = ''
+
+    def append(self, v):
+        self._repr += v + '\n'
+
+    def __repr__(self):
+        return self._repr if self._repr else super().__repr__()
 
 
 class Parser:
@@ -207,7 +214,13 @@ def parse_config(config_file):
         section_dict = config_dict.get(name)
         if not isinstance(section_dict, dict):
             section_dict = {}
-        for k, v in parser_dict.items():
-            setattr(getattr(config, name), k, v.parse(section_dict.get(k), config_file))
+        for k, parser in parser_dict.items():
+            value = parser.parse(section_dict.get(k), config_file)
+            setattr(getattr(config, name), k, value)
+            if parser.key == 'user.password':
+                value = '*' * len(value)
+            elif isinstance(value, datetime):
+                value = value.strftime('%Y-%m-%d %H:%M:%S')
+            config.append('%s=%s' % (parser.key, repr(value)))
 
     return config
