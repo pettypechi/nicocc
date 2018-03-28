@@ -198,7 +198,11 @@ for section, parsers in _PARSER_MAP:
 
 def parse_config(config_file):
     try:
-        config_dict = toml.load(config_file)
+        with open(config_file, 'rb') as reader:
+            bytes = reader.read()
+            if len(bytes) > 2 and bytes[:3] == b'\xef\xbb\xbf':
+                bytes = bytes[3:]
+            config_dict = toml.loads(bytes.decode())
     except Exception:
         print('設定ファイル "%s" の読み込みに失敗しました。' % config_file, file=sys.stderr)
         sys.exit(1)
