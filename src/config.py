@@ -34,8 +34,7 @@ class Config:
 
 
 class Parser:
-    def __init__(self, key, **kwargs):
-        self._key = key
+    def __init__(self, **kwargs):
         self._default_value = kwargs.get('default_value')
         self._validate_func = kwargs.get('validate_func')
         self._represent_func = kwargs.get('represent_func')
@@ -43,6 +42,9 @@ class Parser:
     @property
     def key(self):
         return self._key
+
+    def set_key(self, key):
+        self._key = key
 
     def validate(self, value, file):
         pass
@@ -71,8 +73,8 @@ class Parser:
 
 
 class TypeParser(Parser):
-    def __init__(self, type, key, **kwargs):
-        super().__init__(key, **kwargs)
+    def __init__(self, type, **kwargs):
+        super().__init__(**kwargs)
         self._type = type
 
     def validate(self, value, file):
@@ -81,13 +83,13 @@ class TypeParser(Parser):
 
 
 class StringParser(TypeParser):
-    def __init__(self, key, **kwargs):
-        super().__init__(str, key, **kwargs)
+    def __init__(self, **kwargs):
+        super().__init__(str, **kwargs)
 
 
 class IntParser(TypeParser):
-    def __init__(self, key, **kwargs):
-        super().__init__(int, key, **kwargs)
+    def __init__(self, **kwargs):
+        super().__init__(int, **kwargs)
 
 
 class UIntParser(IntParser):
@@ -98,13 +100,13 @@ class UIntParser(IntParser):
 
 
 class BoolParser(TypeParser):
-    def __init__(self, key, **kwargs):
-        super().__init__(bool, key, **kwargs)
+    def __init__(self, **kwargs):
+        super().__init__(bool, **kwargs)
 
 
 class UIntListParser(TypeParser):
-    def __init__(self, key, **kwargs):
-        super().__init__(list, key, **kwargs)
+    def __init__(self, **kwargs):
+        super().__init__(list, **kwargs)
 
     def validate(self, value, file):
         super().validate(value, file)
@@ -146,59 +148,53 @@ _LEVEL_DICT = {
     'NOTSET': NOTSET,
 }
 
-_PARSER_DICT = {
-    'user': {
-        'mail': StringParser('user.mail'),
-        'password': StringParser('user.password'),
-    },
-    'counter': {
-        'start': DateParser('counter.start'),
-        'end': DateParser('counter.end'),
-        'mylist': UIntListParser(
-            'counter.mylist',
+_PARSER_MAP = (
+    ('user', (
+        ('mail', StringParser()),
+        ('password', StringParser()),
+    )),
+    ('counter', (
+        ('start', DateParser()),
+        ('end', DateParser()),
+        ('mylist', UIntListParser(
             default_value=[],
-        ),
-        'overwrite_videos': BoolParser(
-            'counter.overwrite_videos',
+        )),
+        ('overwrite_videos', BoolParser(
             default_value=True,
-        ),
-        'skip_first_row': BoolParser(
-            'counter.skip_first_row',
+        )),
+        ('skip_first_row', BoolParser(
             default_value=True,
-        ),
-        'encoding': StringParser(
-            'counter.encoding',
+        )),
+        ('encoding', StringParser(
             default_value='cp932',
-        )
-    },
-    'http': {
-        'interval': UIntParser(
-            'counter.interval',
+        )),
+    )),
+    ('http', (
+        ('interval', UIntParser(
             default_value=1,
             represent_func=lambda _: _ / 1000,
-        ),
-        'server_error_interval': UIntParser(
-            'counter.server_error_interval',
+        )),
+        ('server_error_interval', UIntParser(
             default_value=30,
             represent_func=lambda _: _ / 1000,
-        ),
-        'retry': UIntParser(
-            'counter.retry',
+        )),
+        ('retry', UIntParser(
             default_value=2,
-        ),
-    },
-    'logging': {
-        'level': StringParser(
-            'logging.level',
+        )),
+    )),
+    ('logging', (
+        ('level', StringParser(
             represent_func=lambda _: _LEVEL_DICT.get(_, INFO),
-        ),
-        'format': StringParser(
-            'logging.format',
+        )),
+        ('format', StringParser(
             default_value='[%(levelname)s] %(asctime)s - %(name)s: %(message)s',
-        )
-    },
-}
+        )),
+    )),
+)
 
+for section, parsers in _PARSER_MAP:
+    for name, parser in parsers:
+        parser.set_key("%s.%s" % (section, name))
 
 def parse_config(config_file):
     try:
@@ -209,12 +205,12 @@ def parse_config(config_file):
 
     config = Config()
 
-    for name, parser_dict in _PARSER_DICT.items():
+    for name, parsers in _PARSER_MAP:
         setattr(config, name, Config())
         section_dict = config_dict.get(name)
         if not isinstance(section_dict, dict):
             section_dict = {}
-        for k, parser in parser_dict.items():
+        for k, parser in parsers:
             value = parser.parse(section_dict.get(k), config_file)
             setattr(getattr(config, name), k, value)
             if parser.key == 'user.password':
