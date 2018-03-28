@@ -28,6 +28,7 @@ if __name__ == '__main__':
         for arg in sys.argv[2:]:
             print('%s の設定値' % arg)
             print(Resource(arg).config)
+        sys.exit(1)
     for arg in sys.argv[1:]:
         with Resource(arg) as r:
             puts('%s の処理を開始します。' % arg, logger)
